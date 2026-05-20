@@ -72,7 +72,7 @@ The easiest way to run the entire system locally is via Docker.
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/kacpipl2006/deepfake-detector.git](https://github.com/kacpipl2006/deepfake-detector.git)
+   git clone https://github.com/kacpipl2006/deepfake-detector.git
    cd deepfake-detector
    ```
 
