@@ -9,7 +9,7 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import numpy as np
-FACE_DETECTOR_MODEL_PATH = "../blaze_face_short_range.tflite"
+FACE_DETECTOR_MODEL_PATH = "blaze_face_short_range.tflite"
 
 base_options = python.BaseOptions(
     model_asset_path=FACE_DETECTOR_MODEL_PATH
