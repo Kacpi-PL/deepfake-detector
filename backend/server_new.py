@@ -90,7 +90,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = build_binary_resnet()
 
 
-WEIGHTS_PATH = "models/resnet50_deepfake_weights.pth"
+WEIGHTS_PATH = "resnet50_deepfake_weights.pth"
 
 model.load_state_dict(torch.load(WEIGHTS_PATH, map_location=device, weights_only=True))
 model.to(device)
