@@ -34,7 +34,7 @@ graph LR
 
 ## Key Features & MLOps Practices
 
-* **Robust Data Pipeline:** Custom PyTorch `Dataset` and `DataLoader` implementations with strict `torchvision.transforms.v2` augmentations (RandomResizedCrop, ColorJitter) to prevent overfitting.
+* **Robust Data Pipeline:** Custom PyTorch `Dataset` and `DataLoader` implementations with strict `torchvision.transforms.v2` augmentations (RandomResizedCrop, v2.JPEG and RandomHorizontalFlip) to prevent overfitting.
 * **Data Leakage Prevention:** Fixed and frozen data splits (Train/Val/Test) exported to CSVs to ensure 100% experiment reproducibility.
 * **Explainable AI (XAI):** Integrated **Grad-CAM** to visualize which facial features (e.g., specific artifacts in hair or background) trigger the model's "Fake" prediction.
 * **Decoupled Architecture:** The system separates the training logic (PyTorch Lightning), inference API (FastAPI), and presentation layer (Streamlit).
