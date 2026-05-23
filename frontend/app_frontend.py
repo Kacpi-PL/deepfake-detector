@@ -46,11 +46,11 @@ if uploaded_file is not None:
                     # Changing site look depending on pred.
                     if "Fake" in prediction:
                         st.error(
-                            f"**StyleGAN3 deepfake detected** (Klasa: {prediction})"
+                            f"**StyleGAN3 deepfake detected** (Class: {prediction})"
                         )
                     else:
                         st.success(
-                            f"**No StyleGAN3 deepfake detected** (Klasa: {prediction})"
+                            f"**No StyleGAN3 deepfake detected** (Class: {prediction})"
                         )
 
                     # Confidence score
