@@ -6,7 +6,9 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.20+-FF4B4B.svg)](https://streamlit.io/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-An end-to-end Machine Learning pipeline and web application designed to detect AI-generated faces (StyleGAN3) with high confidence. The system features a two-stage inference architecture, Explainable AI (XAI) for decision transparency, and is fully containerized for cloud deployment.
+An end-to-end Machine Learning pipeline and web application designed to detect **StyleGAN3-generated** faces. The system features a two-stage inference architecture, Explainable AI (XAI) for decision transparency, and is fully containerized for cloud deployment.
+
+> **Scope note:** This is a *specialist* StyleGAN3 detector, not a general "is this AI?" classifier. Its real-world behaviour and failure modes are documented honestly in [Known Limitations](#known-limitations--weaknesses) — please read that section before interpreting the metrics below.
 
 **Live Demo:** [https://deepfake.krystiansubdys.pl](https://deepfake.krystiansubdys.pl)
 
@@ -43,7 +45,7 @@ graph LR
 
 ## Evaluation & Explainability
 
-The model was rigorously evaluated on an unseen test set, avoiding the common training-serving skew by maintaining absolute preprocessing parity between the training script and the production API.
+The model was evaluated on a held-out test set drawn from the **same distribution** as training. The figures below therefore represent an **in-distribution ceiling**, not real-world accuracy — see [Known Limitations](#known-limitations--weaknesses) for the gap between this benchmark and in-the-wild performance.
 
 ### Confusion Matrix & Metrics
 ![Confusion Matrix](./assets/confusion_matrix_portfolio.png)
@@ -52,6 +54,27 @@ The model was rigorously evaluated on an unseen test set, avoiding the common tr
 To understand the model's blind spots, Grad-CAM heatmaps were generated for misclassified images. This highlights the precise pixel regions that led to false positives/negatives, allowing for targeted dataset improvements in the future.
 
 ![XAI Error Analysis](./assets/xai_error_analysis.png)
+
+---
+
+## Known Limitations & Weaknesses
+
+This model is a **specialist, not a general AI-image detector.** It was tested on in-the-wild images, and its boundaries are stated here honestly:
+
+* **Single generator (StyleGAN3 only).** Trained exclusively on Real vs. StyleGAN3 faces, it does **not** reliably detect other sources (other GANs, diffusion models such as Midjourney/SDXL, etc.). A `Real` verdict means *"not StyleGAN3"* — **not** *"not AI-generated."*
+* **Sensitive to compression.** The classifier keys on high-frequency generative artifacts. Heavy JPEG compression smooths these away, so hard-compressed StyleGAN3 faces are frequently **missed (false negatives)**. The current training augmentation only simulates light compression (quality 80–100), leaving heavily compressed web images out of distribution.
+* **Watermarks & overlays.** Text watermarks or graphics over a face mask the artifact regions the model relies on, leading to misclassification.
+* **Benchmark vs. reality gap.** The reported confusion matrix / F1 come from a held-out test set in the *same distribution* as training. This is an **in-distribution ceiling** and is **not** representative of real-world accuracy, which is lower — especially on compressed or non-StyleGAN3 inputs.
+* **Small / distant / occluded faces.** Small in-frame faces are upscaled before classification, destroying the fine texture the model depends on; reliability drops accordingly.
+
+These were verified by manual in-the-wild testing: real faces are classified correctly almost always, while StyleGAN3 misses cluster on **compressed** and **watermarked** images — consistent with an artifact-based detector.
+
+## Future Work
+
+* **Stronger degradation augmentation** — aggressive JPEG (quality 30–90) plus random down/up-scaling during training, to harden the model against the compressed web images where it currently fails.
+* **Train/serve preprocessing parity** — align the inference face-crop with the training crop (calibrated MediaPipe margins, fit-square framing, no padding) so the model is served the exact framing it learned on.
+* **Multi-generator support** — extend the dataset and the (already 2-logit) head toward detecting additional generators, moving from a StyleGAN3 specialist toward a general detector.
+* **Confidence-aware abstention** — return *"uncertain / no face detected"* instead of forcing a Real/Fake verdict on ambiguous inputs.
 
 ---
 
